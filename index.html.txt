@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mindora AI</title>
+  <style>
+    body { font-family: Arial; text-align: center; background: #111; color: white; }
+    #chat { width: 90%; max-width: 500px; margin: auto; }
+    input { width: 70%; padding: 10px; }
+    button { padding: 10px; }
+    .msg { background: #222; margin: 10px; padding: 10px; border-radius: 10px; }
+  </style>
+</head>
+
+<body>
+
+<h2>🤖 Mindora AI Chat</h2>
+
+<div id="chat"></div>
+
+<input id="userInput" placeholder="Type something..." />
+<button onclick="sendMsg()">Send</button>
+
+<script>
+const API_KEY = const API_KEY = "";
+
+async function sendMsg() {
+  let input = document.getElementById("userInput").value;
+  if (!input) return;
+
+  addMsg("You: " + input);
+
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + API_KEY
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        messages: [
+          { role: "user", content: input }
+        ]
+      })
+    });
+
+    const data = await res.json();
+
+    let reply = data.choices?.[0]?.message?.content || "Error getting response";
+
+    addMsg("AI: " + reply);
+
+  } catch (err) {
+    addMsg("⚠️ Failed to fetch (we will fix next step)");
+  }
+}
+
+function addMsg(text) {
+  let div = document.createElement("div");
+  div.className = "msg";
+  div.innerText = text;
+  document.getElementById("chat").appendChild(div);
+}
+</script>
+
+</body>
+</html>
